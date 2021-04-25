@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-from pyod.models.knn import KNN
-from joblib import dump, load
+import matplotlib.pyplot as plt
+from pyod.models.hbos import HBOS
+from pyod.utils.data import evaluate_print
 
 column_names = [
     'timestamp', 'duration', 'source_ip', 'dst_ip', 'source_port', 'dst_port',
@@ -24,12 +25,20 @@ dtypes = {
     'type': str
 }
 
-df = pd.read_csv('./data/training/uniq/20160318.csv', nrows=10000, header=None, names=column_names, dtype=dtypes, parse_dates=[0])
-df2 = pd.read_csv('./data/march/week3/spam_flows_cut.csv', nrows=100, header=None, names=column_names, dtype=dtypes, parse_dates=[0])
+df = pd.read_csv('./data/training/uniq/20160318.csv', header=None, names=column_names, dtype=dtypes, parse_dates=[0])
+#df2 = pd.read_csv('./data/march/week3/spam_flows_cut.csv', nrows=100, header=None, names=column_names, dtype=dtypes, parse_dates=[0])
 
-print(df.head(10))
-print('-------\n\n')
-print(df2.head(10))
-print('*******\n\n')
-df_group = df.groupby([df['timestamp'].dt.time]).mean()
-print(df_group.head(10))
+df_group = df.groupby([df['timestamp'].dt.hour, df['timestamp'].dt.minute]).agg(['count'])
+xaxis = np.arange(df_group.shape[0])
+yaxis = df_group['timestamp'].values[:,0]
+plt.plot(xaxis, yaxis)
+plt.show()
+
+outlier_fraction = 0.1
+X_train = np.concatenate((xaxis, yaxis), axis=1)
+#clf_name = 'HBOS'
+#clf = HBOS()
+#clf.fit(X_train)
+#y_train_pred = clf.labels_
+#y_train_scores = clf.decision_scores_ 
+#evaluate_print(clf_name, y_train, y_train_scores)
