@@ -128,5 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#data
+# data
 data/
+
+#Jupyter HTML file
+outlier_detection.html
